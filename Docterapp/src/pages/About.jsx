@@ -25,19 +25,27 @@ function AboutDocter() {
         backdropFilter: 'blur(2px)',
       }}
     >
-      <Container
-        style={{
-          background: 'rgba(255,255,255,0.5)', // more transparent container
-          borderRadius: '18px',
-          boxShadow: '0 4px 24px rgba(0,0,0,0.10)',
-          padding: '4rem 2.5rem 2.5rem 2.5rem', // increased top padding
-          maxWidth: 1000,
-          width: '95%',
-          margin: '60px auto 0 auto', // center horizontally, add top margin for vertical centering
-          position: 'relative',
-          zIndex: 1, // to appear above the background
-        }}
-      >
+ <Container
+  style={{
+    background: 'rgba(255,255,255,0.5)',
+    borderRadius: '25px',
+    boxShadow: '0 4px 24px rgba(0,0,0,0.10)',
+    padding: '4rem 2.5rem',
+    width: '90%', // percent-based but not full width
+    maxWidth: '1000px',
+    margin: '0 auto',
+    position: 'absolute',
+    left: '50%',
+    top: '50%',
+    transform: 'translate(-50%, -50%)',
+    zIndex: 1,
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    boxSizing: 'border-box',
+  }}
+>
      
 
         <div style={{ position: 'relative', zIndex: 1 }}>

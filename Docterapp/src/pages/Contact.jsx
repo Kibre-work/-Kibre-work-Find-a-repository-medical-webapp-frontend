@@ -56,17 +56,23 @@ function ContactMe() {
     >
       <Container fluid style={{
         background: 'rgba(0,0,0,0.55)',
-        borderRadius: '18px',
-        boxShadow: '0 4px 24px rgba(0,0,0,0.15)',
-        padding: '1.5rem',
+        borderRadius: 0,
+        boxShadow: 'none',
+        padding: 0,
         width: '100vw',
-        minHeight: '100vh',
+        minHeight: '160vh',
         height: '100%',
         margin: 0,
         color: '#fff',
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'center',
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        zIndex: 1,
       }}>
         
         <Row className="mb-4 justify-content-center align-items-center">

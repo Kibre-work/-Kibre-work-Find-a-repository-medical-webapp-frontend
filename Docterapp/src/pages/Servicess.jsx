@@ -1,6 +1,7 @@
 import React from 'react';
 import { Container, Row, Col, Card } from 'react-bootstrap';
 import { FaStethoscope } from 'react-icons/fa';
+import { motion } from 'framer-motion';
 
 const services = [
   'General health check-ups',
@@ -71,18 +72,20 @@ const GPServices = () => {
               style={{ minHeight: 'auto' }}
             >
               <Card
+                as={motion.div}
+                whileHover={{ scale: 1.08 }}
+                whileTap={{ scale: 0.96 }}
+                initial={{ opacity: 0, y: 40 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: idx * 0.07, type: 'spring' }}
                 className="shadow-sm w-100 d-flex flex-column"
                 style={{
                   cursor: 'pointer',
                   transition: 'transform 0.3s ease',
                   minHeight: 'auto',
                 }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = 'scale(1.05)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = 'scale(1)';
-                }}
+                onMouseEnter={undefined}
+                onMouseLeave={undefined}
               >
                 <Card.Body
                   className="d-flex flex-column align-items-center"
