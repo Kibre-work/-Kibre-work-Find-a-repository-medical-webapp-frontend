@@ -1,10 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Container, Row, Col, Form, Button } from 'react-bootstrap';
-
+import axios from 'axios'; // <-- Add this line
+import ReCAPTCHA from 'react-google-recaptcha';
 
 function ContactMe() {
   const [form, setForm] = useState({ name: '', email: '', message: '' });
   const [errors, setErrors] = useState({});
+  const [submitting, setSubmitting] = useState(false);
+  const [success, setSuccess] = useState(null);
+  const recaptchaRef = useRef();
 
   // Regex for proper name (letters, spaces, at least two words)
   const nameRegex = /^[A-Z][a-zA-Z]+(\s[A-Z][a-zA-Z]+)+$/;
@@ -32,14 +36,31 @@ function ContactMe() {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (validate()) {
-      // Submit logic here
-      alert('Message sent!');
-      setForm({ name: '', email: '', message: '' });
-      setErrors({});
+    setSuccess(null);
+    setErrors({});
+    setSubmitting(true);
+    let recaptchaToken = null;
+    try {
+      recaptchaToken = await recaptchaRef.current.executeAsync();
+      recaptchaRef.current.reset();
+      if (!recaptchaToken) {
+        setErrors({ recaptcha: 'reCAPTCHA verification failed. Please try again.' });
+        setSubmitting(false);
+        return;
+      }
+      if (validate()) {
+        await axios.post('http://127.0.0.1:8000/api/contact/', { ...form, recaptchaToken }, {
+          headers: { 'Content-Type': 'application/json' }
+        });
+        setSuccess('Message sent successfully!');
+        setForm({ name: '', email: '', message: '' });
+      }
+    } catch {
+      setSuccess('Failed to send message. Please try again later.');
     }
+    setSubmitting(false);
   };
 
   return (
@@ -74,13 +95,9 @@ function ContactMe() {
         bottom: 0,
         zIndex: 1,
       }}>
-        
         <Row className="mb-4 justify-content-center align-items-center">
-          <Col xs={12}>
-            
-          </Col>
+          <Col xs={12}></Col>
         </Row>
-
         <Row className="mb-4">
           {/* Contact Info */}
           <Col md={5}></Col>
@@ -100,6 +117,7 @@ function ContactMe() {
                   style={{ background: 'rgba(255,255,255,0.15)', color: '#fff', border: '1px solid #fff', fontSize: '1.12rem', padding: '0.7rem 1.3rem', height: '2.7rem', maxWidth: 500, margin: '0 auto' }}
                   isInvalid={!!errors.name}
                   size="sm"
+                  disabled={submitting}
                 />
                 <Form.Control.Feedback type="invalid" style={{ fontSize: '1.08rem' }}>{errors.name}</Form.Control.Feedback>
               </Form.Group>
@@ -115,6 +133,7 @@ function ContactMe() {
                   style={{ background: 'rgba(255,255,255,0.15)', color: '#fff', border: '1px solid #fff', fontSize: '1.12rem', padding: '0.7rem 1.3rem', height: '2.7rem', maxWidth: 500, margin: '0 auto' }}
                   isInvalid={!!errors.email}
                   size="sm"
+                  disabled={submitting}
                 />
                 <Form.Control.Feedback type="invalid" style={{ fontSize: '1.08rem' }}>{errors.email}</Form.Control.Feedback>
               </Form.Group>
@@ -131,16 +150,46 @@ function ContactMe() {
                   style={{ background: 'rgba(255,255,255,0.15)', color: '#fff', border: '1px solid #fff', fontSize: '1.12rem', padding: '0.7rem 1.3rem', minHeight: '3.3rem', maxHeight: '8rem', maxWidth: 500, margin: '0 auto' }}
                   isInvalid={!!errors.message}
                   size="sm"
+                  disabled={submitting}
                 />
                 <Form.Control.Feedback type="invalid" style={{ fontSize: '1.08rem' }}>{errors.message}</Form.Control.Feedback>
               </Form.Group>
-              <Button type="submit" variant="light" className="w-100 fw-bold" style={{ color: '#0d6efd', background: '#fff', border: 'none', transition: 'background 0.2s, color 0.2s', fontSize: '1.12rem', padding: '0.7rem 1.3rem', height: '2.8rem', maxWidth: 500, margin: '0 auto' }}
+              <div style={{ margin: '1rem 0', display: 'flex', justifyContent: 'center' }}>
+                <ReCAPTCHA
+                  ref={recaptchaRef}
+                  sitekey="6Lfi0GErAAAAACzYobuzWa03GieSTSVezj0uYh1i"
+                  size="invisible"
+                />
+              </div>
+              {errors.recaptcha && (
+                <div style={{ color: '#ff5252', fontSize: '1.08rem', textAlign: 'center', marginBottom: 8 }}>{errors.recaptcha}</div>
+              )}
+              <Button
+                type="submit"
+                variant="light"
+                className="w-100 fw-bold"
+                style={{ color: '#0d6efd', background: '#fff', border: 'none', transition: 'background 0.2s, color 0.2s', fontSize: '1.12rem', padding: '0.7rem 1.3rem', height: '2.8rem', maxWidth: 500, margin: '0 auto' }}
                 onMouseOver={e => { e.target.style.background = '#0d6efd'; e.target.style.color = '#fff'; }}
                 onMouseOut={e => { e.target.style.background = '#fff'; e.target.style.color = '#0d6efd'; }}
                 size="sm"
+                disabled={submitting}
               >
-                Send Message
+                {submitting ? 'Sending...' : 'Send Message'}
               </Button>
+              {/* Success/Error Message */}
+              {success && (
+                <div style={{
+                  marginTop: '1.2rem',
+                  color: success.includes('success') ? '#4caf50' : '#ff5252',
+                  fontSize: '1.08rem',
+                  textAlign: 'center',
+                  fontWeight: 500,
+                  letterSpacing: '0.01em',
+                  minHeight: 32
+                }}>
+                  {success}
+                </div>
+              )}
               {/* Animated validation instruction */}
               <div style={{
                 marginTop: '1.2rem',

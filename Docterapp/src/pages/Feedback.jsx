@@ -3,11 +3,13 @@ import React, { useState } from "react";
 const Feedback = () => {
     const [form, setForm] = useState({
         email: "",
-        fullname: "",
+        full_name: "",
         comment: "",
         rate: 1,
     });
     const [errors, setErrors] = useState({});
+    const [success, setSuccess] = useState(false);
+    const [submitting, setSubmitting] = useState(false);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -20,8 +22,8 @@ const Feedback = () => {
     const validate = () => {
         const newErrors = {};
         // Name: only letters, at least two words, each starting with a capital, no numbers
-        if (!/^([A-Z][a-z]+\s){1,}[A-Z][a-z]+$/.test(form.fullname.trim())) {
-            newErrors.fullname = "Enter your full name (first and last, capitalized, no numbers).";
+        if (!/^([A-Z][a-z]+\s){1,}[A-Z][a-z]+$/.test(form.full_name.trim())) {
+            newErrors.full_name = "Enter your full name (first and last, capitalized, no numbers).";
         }
         // Email: must be a valid email
         if (!/^[\w-.]+@[\w-]+\.[a-zA-Z]{2,}$/.test(form.email.trim())) {
@@ -34,7 +36,22 @@ const Feedback = () => {
         return newErrors;
     };
 
-    const handleSubmit = (e) => {
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    const handleSubmit = async (e) => {
         e.preventDefault();
         const validationErrors = validate();
         if (Object.keys(validationErrors).length > 0) {
@@ -42,8 +59,41 @@ const Feedback = () => {
             return;
         }
         setErrors({});
-        // Handle form submission logic here
-        alert("Feedback submitted!");
+        setSubmitting(true);
+        setSuccess(false);
+        try {
+            // Prepare payload to match backend field names
+            const payload = {
+                email: form.email,
+                full_name: form.full_name,
+                comment: form.comment,
+                rating: form.rate, // Backend expects 'rating', not 'rate'
+            };
+            const response = await fetch("http://localhost:8000/api/feedback/", {
+                method: "POST",
+                credentials: "include",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": getCookie('csrftoken'),
+                },
+                body: JSON.stringify(payload),
+            });
+            let errorText = "Failed to submit feedback";
+            let data = null;
+            if (response.headers.get('content-type')?.includes('application/json')) {
+                data = await response.json();
+                if (!response.ok) throw new Error(data.detail || JSON.stringify(data));
+            } else {
+                errorText = await response.text();
+                if (!response.ok) throw new Error(errorText);
+            }
+            setSuccess(true);
+            setForm({ email: "", full_name: "", comment: "", rate: 1 });
+        } catch (err) {
+            setErrors({ submit: err.message });
+        } finally {
+            setSubmitting(false);
+        }
     };
 
     return (
@@ -54,6 +104,8 @@ const Feedback = () => {
                         <div className="card-body">
                             <h3 className="card-title text-center mb-4">Feedback Form</h3>
                             <form onSubmit={handleSubmit}>
+                                {success && <div className="alert alert-success">Thank you for your feedback!</div>}
+                                {errors.submit && <div className="alert alert-danger">{errors.submit}</div>}
                                 <div className="mb-3">
                                     <label htmlFor="email" className="form-label text-start w-100">
                                         Email address
@@ -78,7 +130,7 @@ const Feedback = () => {
                                     {errors.email && <div className="text-danger small mt-1">{errors.email}</div>}
                                 </div>
                                 <div className="mb-3">
-                                    <label htmlFor="fullname" className="form-label text-start w-100">
+                                    <label htmlFor="full_name" className="form-label text-start w-100">
                                         Full Name
                                     </label>
                                     <div className="input-group">
@@ -88,9 +140,9 @@ const Feedback = () => {
                                         <input
                                             type="text"
                                             className="form-control"
-                                            id="fullname"
-                                            name="fullname"
-                                            value={form.fullname}
+                                            id="full_name"
+                                            name="full_name"
+                                            value={form.full_name}
                                             onChange={handleChange}
                                             required
                                             placeholder="Your full name"
@@ -98,7 +150,7 @@ const Feedback = () => {
                                             aria-describedby="fullname-addon"
                                         />
                                     </div>
-                                    {errors.fullname && <div className="text-danger small mt-1">{errors.fullname}</div>}
+                                    {errors.full_name && <div className="text-danger small mt-1">{errors.full_name}</div>}
                                 </div>
                                 <div className="mb-3">
                                     <label htmlFor="comment" className="form-label">
@@ -137,8 +189,8 @@ const Feedback = () => {
                                         ))}
                                     </div>
                                 </div>
-                                <button type="submit" className="btn btn-primary w-100">
-                                    Submit Feedback
+                                <button type="submit" className="btn btn-primary w-100" disabled={submitting}>
+                                    {submitting ? "Submitting..." : "Submit Feedback"}
                                 </button>
                             </form>
                         </div>

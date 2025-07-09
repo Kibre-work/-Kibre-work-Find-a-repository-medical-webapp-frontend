@@ -834,7 +834,7 @@ function Home() {
                   <FaWhatsapp style={{ marginRight: 8, fontSize: 22 }} /> Call Us
                 </Button>
               </a>
-              <Link to="/BookAppointment" className="book-appointment-btn" style={{ width: '100%' }}>
+              <Link to="/register" className="book-appointment-btn" style={{ width: '100%' }}>
                 <Button
                   variant="primary"
                   className="book-appointment-btn w-100 custom-blue-btn"
