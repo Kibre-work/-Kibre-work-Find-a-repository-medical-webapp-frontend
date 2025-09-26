@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Container, Row, Col } from 'react-bootstrap';
 import { useLocation, useNavigate } from 'react-router-dom';
 import PatientSidebar from '../components/PatientSidebar';
@@ -10,6 +10,7 @@ import PatientVideoInvites from '../components/PatientVideoInvites';
 import DownloadPrescriptions from './DownloadPrescriptions';
 
 function PatientDashboard() {
+  // Toasts removed per request; bell and dropdown remain active
   const navigate = useNavigate();
   const location = useLocation();
 

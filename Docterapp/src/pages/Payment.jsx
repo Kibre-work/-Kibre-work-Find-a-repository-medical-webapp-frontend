@@ -1,110 +1,80 @@
 import React, { useState } from 'react';
-import { Card, Form, Button, Row, Col, Alert } from 'react-bootstrap';
-import { FaCreditCard, FaMoneyCheckAlt } from 'react-icons/fa';
+import { Button, Card, Alert } from 'react-bootstrap';
+import { loadStripe } from '@stripe/stripe-js';
+
+// Load your Stripe public key
+const stripePromise = loadStripe('your_stripe_public_key_here'); // Replace with real publishable key
 
 const Payment = () => {
-  const [form, setForm] = useState({
-    name: '',
-    cardNumber: '',
-    expiry: '',
-    cvc: '',
-    amount: '',
-  });
-  const [success, setSuccess] = useState(false);
-  const [error, setError] = useState('');
+  const [message, setMessage] = useState('');
 
-  const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+  const handleStripePayment = async () => {
+    try {
+      const stripe = await stripePromise;
+
+      const res = await fetch('http://localhost:8000/create-stripe-session/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ amount: 2000 }), // Optional: send amount in cents
+      });
+
+      const data = await res.json();
+
+      if (data.error) {
+        setMessage(data.error);
+        return;
+      }
+
+      await stripe.redirectToCheckout({
+        sessionId: data.id,
+      });
+    } catch (err) {
+      setMessage('Stripe payment failed.');
+    }
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    setSuccess(false);
-    setError('');
-    // TODO: Connect to backend/payment gateway
-    if (form.cardNumber.length < 12 || form.cvc.length < 3 || !form.amount) {
-      setError('Please enter valid payment details.');
-      return;
+  const handleChapaPayment = async () => {
+    try {
+      const res = await fetch('http://localhost:8000/create-chapa-transaction/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          amount: 200, // in ETB
+          email: 'test@example.com', // replace or collect from form
+          first_name: 'John',
+          last_name: 'Doe',
+          phone_number: '0911000000',
+        }),
+      });
+
+      const data = await res.json();
+
+      if (data.error) {
+        setMessage(data.error);
+        return;
+      }
+
+      // Redirect to Chapa payment page
+      window.location.href = data.checkout_url;
+    } catch (err) {
+      setMessage('Chapa payment failed.');
     }
-    setSuccess(true);
-    setForm({ name: '', cardNumber: '', expiry: '', cvc: '', amount: '' });
   };
 
   return (
-    <Card className="mb-4 shadow-sm" style={{ maxWidth: 480, margin: '2rem auto', borderRadius: 16 }}>
-      <Card.Body>
-        <div className="d-flex align-items-center mb-3">
-          <FaMoneyCheckAlt size={28} style={{ color: '#0d6efd', marginRight: 10 }} />
-          <Card.Title className="mb-0" style={{ fontSize: 22, fontWeight: 600 }}>Make a Payment</Card.Title>
-        </div>
-        {success && <Alert variant="success">Payment successful!</Alert>}
-        {error && <Alert variant="danger">{error}</Alert>}
-        <Form onSubmit={handleSubmit}>
-          <Form.Group className="mb-3">
-            <Form.Label>Name on Card</Form.Label>
-            <Form.Control
-              type="text"
-              name="name"
-              value={form.name}
-              onChange={handleChange}
-              placeholder="Full Name"
-              required
-            />
-          </Form.Group>
-          <Form.Group className="mb-3">
-            <Form.Label>Card Number</Form.Label>
-            <Form.Control
-              type="text"
-              name="cardNumber"
-              value={form.cardNumber}
-              onChange={handleChange}
-              placeholder="1234 5678 9012 3456"
-              required
-              maxLength={19}
-            />
-          </Form.Group>
-          <Row>
-            <Col md={6} className="mb-3">
-              <Form.Label>Expiry Date</Form.Label>
-              <Form.Control
-                type="text"
-                name="expiry"
-                value={form.expiry}
-                onChange={handleChange}
-                placeholder="MM/YY"
-                required
-                maxLength={5}
-              />
-            </Col>
-            <Col md={6} className="mb-3">
-              <Form.Label>CVC</Form.Label>
-              <Form.Control
-                type="password"
-                name="cvc"
-                value={form.cvc}
-                onChange={handleChange}
-                placeholder="CVC"
-                required
-                maxLength={4}
-              />
-            </Col>
-          </Row>
-          <Form.Group className="mb-4">
-            <Form.Label>Amount</Form.Label>
-            <Form.Control
-              type="number"
-              name="amount"
-              value={form.amount}
-              onChange={handleChange}
-              placeholder="Amount"
-              min={1}
-              required
-            />
-          </Form.Group>
-          <Button type="submit" variant="primary" className="w-100" style={{ fontSize: '1.1rem', fontWeight: 500 }}>
-            <FaCreditCard className="me-2" />Pay Now
-          </Button>
-        </Form>
+    <Card className="shadow-sm" style={{ maxWidth: 500, margin: '2rem auto', borderRadius: 16 }}>
+      <Card.Body className="text-center">
+        <h4 className="mb-3">Choose Payment Method</h4>
+
+        {message && <Alert variant="danger">{message}</Alert>}
+
+        <Button variant="primary" className="mb-3 w-100" onClick={handleStripePayment}>
+          Pay with Stripe (Card – USD)
+        </Button>
+
+        <Button variant="success" className="w-100" onClick={handleChapaPayment}>
+          Pay with Chapa (Ethiopia – ETB)
+        </Button>
       </Card.Body>
     </Card>
   );

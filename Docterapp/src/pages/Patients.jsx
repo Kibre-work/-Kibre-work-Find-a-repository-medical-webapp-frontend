@@ -98,36 +98,58 @@ const Patients = () => {
   };
 
   return (
-    <div className="container" style={{ maxWidth: 900, margin: '2rem auto', minHeight: 800 }}>
-      <h3 className="mb-4">Patients</h3>
+    <div style={{ 
+      width: '100%', 
+      height: '100vh', 
+      padding: '2rem', 
+      background: '#f8f9fa',
+      overflow: 'hidden'
+    }}>
+      <div style={{ 
+        display: 'flex', 
+        justifyContent: 'space-between', 
+        alignItems: 'center', 
+        marginBottom: '2rem',
+        paddingBottom: '1rem',
+        borderBottom: '2px solid #e0e0e0'
+      }}>
+        <h2 style={{ 
+          margin: 0, 
+          color: '#0d6efd', 
+          fontWeight: 600,
+          fontSize: '2rem'
+        }}>
+          Patient Management
+        </h2>
+        <div style={{ fontSize: '1.1rem', color: '#666' }}>
+          Total Patients: {patients.length}
+        </div>
+      </div>
+      
       {loading ? (
-        <table className="table">
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Age</th>
-              <th>Phone</th>
-              <th>Country</th>
-              <th>Allergies</th>
-              <th>Injuries</th>
-              <th>Chronic Conditions</th>
-              <th>Medications</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td colSpan={9} style={{ textAlign: 'center' }}>Loading...</td>
-            </tr>
-          </tbody>
-        </table>
+        <div style={{ 
+          display: 'flex', 
+          justifyContent: 'center', 
+          alignItems: 'center', 
+          height: 'calc(100vh - 200px)',
+          background: '#fff',
+          borderRadius: '8px',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+        }}>
+          <div style={{ textAlign: 'center' }}>
+            <div style={{ fontSize: '1.2rem', color: '#666', marginBottom: '1rem' }}>Loading patients...</div>
+            <div style={{ width: '40px', height: '40px', border: '4px solid #f3f3f3', borderTop: '4px solid #0d6efd', borderRadius: '50%', animation: 'spin 1s linear infinite', margin: '0 auto' }}></div>
+          </div>
+        </div>
       ) : (
-        <PatientTable
-          patients={patients}
-          onView={handleView}
-          onDelete={handleDelete}
-          onPhotoClick={photo => setZoomedPhoto(photo)}
-        />
+        <div style={{ height: 'calc(100vh - 200px)' }}>
+          <PatientTable
+            patients={patients}
+            onView={handleView}
+            onDelete={handleDelete}
+            onPhotoClick={photo => setZoomedPhoto(photo)}
+          />
+        </div>
       )}
       {/* Modal for view/edit */}
       <Dialog open={!!selectedPatient} onClose={handleClose} maxWidth="md" fullWidth>

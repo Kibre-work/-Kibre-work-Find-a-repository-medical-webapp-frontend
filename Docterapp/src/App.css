@@ -77,3 +77,9 @@ background-color: rgba(0, 123, 255, 0.9); /* blue with 60% opacity */
   background-color: rgba(20, 30, 60, 1) !important;
   color: #fff !important;
 }
+
+/* Loading spinner animation */
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}

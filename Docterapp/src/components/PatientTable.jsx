@@ -84,35 +84,70 @@ export default function PatientTable({ patients, onView, onDelete, onPhotoClick 
   );
 
   return (
-    <Box sx={{ height: 600, width: '100%', background: '#fff', borderRadius: 2, boxShadow: 2, p: 2 }}>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+    <Box sx={{ 
+      height: '80vh', 
+      width: '100%', 
+      background: '#fff', 
+      borderRadius: 2, 
+      boxShadow: '0 4px 12px rgba(0,0,0,0.1)', 
+      p: 3,
+      border: '1px solid #e0e0e0',
+      position: 'relative',
+      overflow: 'hidden'
+    }}>
+      <Box sx={{ 
+        display: 'flex', 
+        justifyContent: 'space-between', 
+        alignItems: 'center', 
+        mb: 3,
+        pb: 2,
+        borderBottom: '2px solid #f0f0f0'
+      }}>
         <TextField
           label="Search patients"
           variant="outlined"
           size="small"
           value={search}
           onChange={e => setSearch(e.target.value)}
-          sx={{ width: 300 }}
+          sx={{ width: 350 }}
         />
         <Button
           variant="contained"
           color="success"
           startIcon={<DownloadIcon />}
           onClick={() => exportToCSV(filteredRows, columns.filter(col => col.field !== 'actions'))}
+          sx={{ fontWeight: 600 }}
         >
           Export CSV
         </Button>
       </Box>
-      <DataGrid
-        rows={filteredRows}
-        columns={columns}
-        pageSize={10}
-        rowsPerPageOptions={[10, 25, 50]}
-        pagination
-        disableSelectionOnClick
-        components={{ Toolbar: GridToolbar }}
-        sx={{ fontSize: 16 }}
-      />
+      <Box sx={{ height: 'calc(80vh - 120px)', width: '100%' }}>
+        <DataGrid
+          rows={filteredRows}
+          columns={columns}
+          pageSize={25}
+          rowsPerPageOptions={[25, 50, 100]}
+          pagination
+          disableSelectionOnClick
+          components={{ Toolbar: GridToolbar }}
+          sx={{ 
+            fontSize: 14,
+            '& .MuiDataGrid-root': {
+              border: 'none'
+            },
+            '& .MuiDataGrid-cell': {
+              borderBottom: '1px solid #f0f0f0'
+            },
+            '& .MuiDataGrid-columnHeaders': {
+              backgroundColor: '#f8f9fa',
+              borderBottom: '2px solid #e0e0e0'
+            },
+            '& .MuiDataGrid-row:hover': {
+              backgroundColor: '#f5f5f5'
+            }
+          }}
+        />
+      </Box>
     </Box>
   );
 } 

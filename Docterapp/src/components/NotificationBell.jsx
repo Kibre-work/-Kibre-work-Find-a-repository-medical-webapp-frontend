@@ -43,6 +43,25 @@ const NotificationBell = () => {
       const data = await res.json();
       setNotifications(data);
       setCount(data.filter(n => !n.is_read).length);
+      // Emit event for any new unread appointment items to allow toasts
+      const hasUnreadAppointment = Array.isArray(data) && data.some(n => !n.is_read && n.type === 'appointment');
+      if (hasUnreadAppointment) {
+        window.dispatchEvent(new CustomEvent('appointments:new', {
+          detail: {
+            notifications: data.filter(n => !n.is_read && n.type === 'appointment')
+          }
+        }));
+      }
+
+      // Emit event for any new unread prescription items to allow toasts
+      const hasUnreadPrescription = Array.isArray(data) && data.some(n => !n.is_read && n.type === 'prescription');
+      if (hasUnreadPrescription) {
+        window.dispatchEvent(new CustomEvent('prescriptions:new', {
+          detail: {
+            notifications: data.filter(n => !n.is_read && n.type === 'prescription')
+          }
+        }));
+      }
     } catch {
       setCount(0);
       setError('Failed to fetch notifications');
@@ -73,7 +92,16 @@ const NotificationBell = () => {
   useEffect(() => {
     fetchNotifications();
     pollingRef.current = setInterval(fetchNotifications, 5000); // Poll every 5 seconds
-    return () => clearInterval(pollingRef.current);
+    // Listen for app-wide refresh events to update immediately
+    const handleRefresh = () => {
+      fetchNotifications();
+    };
+    window.addEventListener('notifications:refresh', handleRefresh);
+
+    return () => {
+      clearInterval(pollingRef.current);
+      window.removeEventListener('notifications:refresh', handleRefresh);
+    };
   }, []);
 
   const handleBellClick = () => {

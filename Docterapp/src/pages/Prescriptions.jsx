@@ -54,6 +54,8 @@ const Prescriptions = () => {
       setShowSuccess(true);
       setForm({ patient: "", medication: "", dosage: "", instructions: "" });
       setTimeout(() => setShowSuccess(false), 2500);
+      // Ask any open NotificationBell to refresh immediately
+      window.dispatchEvent(new Event('notifications:refresh'));
     } catch (err) {
       alert(err.message);
     }
