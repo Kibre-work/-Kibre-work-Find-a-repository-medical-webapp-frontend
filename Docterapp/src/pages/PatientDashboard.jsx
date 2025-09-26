@@ -5,6 +5,7 @@ import PatientSidebar from '../components/PatientSidebar';
 import HealthStatusForm from './HealthStatusForm';
 import BookPatient from './BookPatient';
 import NotificationBell from '../components/NotificationBell';
+import PrescriptionNotification from '../components/PrescriptionNotification';
 import Payment from './Payment';
 import PatientVideoInvites from '../components/PatientVideoInvites';
 import DownloadPrescriptions from './DownloadPrescriptions';
@@ -82,6 +83,7 @@ function PatientDashboard() {
               <NotificationBell />
             </div>
           </div>
+          <PrescriptionNotification />
           {mainContent}
         </Col>
       </Row>
