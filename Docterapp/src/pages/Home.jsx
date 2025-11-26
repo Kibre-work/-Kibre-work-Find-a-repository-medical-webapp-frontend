@@ -737,7 +737,7 @@ function Home() {
   }, []);
 
   return (
-    <Container fluid className="home-hero-section" style={{ minHeight: '100vh', padding: 0, marginBottom: '20px' }}>
+    <Container id="home" fluid className="home-hero-section" style={{ minHeight: '100vh', padding: 0, marginBottom: '20px' }}>
       {/* Hero Section with background image and overlay */}
       <div style={{
         position: 'relative',

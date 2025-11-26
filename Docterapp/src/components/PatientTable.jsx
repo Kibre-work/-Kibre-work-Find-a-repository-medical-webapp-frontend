@@ -4,6 +4,8 @@ import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import DownloadIcon from '@mui/icons-material/Download';
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 
 function exportToCSV(rows, columns) {
   const header = columns.map(col => col.headerName).join(',');
@@ -57,18 +59,34 @@ export default function PatientTable({ patients, onView, onDelete, onPhotoClick 
     {
       field: 'actions',
       headerName: 'Actions',
-      width: 160,
+      width: 240,
       sortable: false,
       filterable: false,
+      headerAlign: 'right',
+      align: 'right',
       renderCell: (params) => (
-        <>
-          <Button size="small" variant="outlined" color="primary" style={{ marginRight: 8 }} onClick={() => onView?.(params.row)}>
+        <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end', width: '100%' }}>
+          <Button
+            size="small"
+            variant="contained"
+            color="primary"
+            onClick={() => onView?.(params.row)}
+            startIcon={<VisibilityIcon />}
+            sx={{ borderRadius: 999, textTransform: 'none', boxShadow: 'none' }}
+          >
             View / Edit
           </Button>
-          <Button size="small" variant="outlined" color="error" onClick={() => onDelete?.(params.row)}>
+          <Button
+            size="small"
+            variant="contained"
+            color="error"
+            onClick={() => onDelete?.(params.row)}
+            startIcon={<DeleteOutlineIcon />}
+            sx={{ borderRadius: 999, textTransform: 'none', boxShadow: 'none' }}
+          >
             Delete
           </Button>
-        </>
+        </div>
       ),
     },
   ], [onView, onDelete, onPhotoClick]);

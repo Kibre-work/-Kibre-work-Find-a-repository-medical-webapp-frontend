@@ -30,10 +30,10 @@ function Footer() {
           <Col md={4} className="mb-4 px-3">
             <h6 className="fw-bold">Quick Links</h6>
             <ul className="list-unstyled">
-              <li><a href="#home" className="text-light text-decoration-none">Home</a></li>
-              <li><a href="#About" className="text-light text-decoration-none">About</a></li>
-              <li><a href="#Services" className="text-light text-decoration-none">Services</a></li>
-              <li><a href="#Contacts" className="text-light text-decoration-none">Contact</a></li>
+              <li><a href="/#home" className="text-light text-decoration-none">Home</a></li>
+              <li><a href="/#About" className="text-light text-decoration-none">About</a></li>
+              <li><a href="/#Services" className="text-light text-decoration-none">Services</a></li>
+              <li><a href="/#Contacts" className="text-light text-decoration-none">Contact</a></li>
             </ul>
           </Col>
 

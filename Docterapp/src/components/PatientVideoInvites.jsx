@@ -37,11 +37,9 @@ const PatientVideoInvites = () => {
   return (
     <Card className="mb-4 shadow-sm" style={{ maxWidth: 600, margin: '0 auto' }}>
       <Card.Body>
-        <Card.Title style={{ fontSize: 20, fontWeight: 600, color: '#0d6efd' }}>Video Call Invitations</Card.Title>
         <ListGroup variant="flush" className="mt-3">
           {invites.map(invite => (
-            <ListGroup.Item key={invite.id} className="d-flex justify-content-between align-items-center">
-              <span>{invite.doctorName} invited you to a video call</span>
+            <ListGroup.Item key={invite.id} className="d-flex justify-content-end align-items-center">
               <Button variant="primary" size="sm" onClick={() => handleJoin(invite.roomName)}>
                 Join
               </Button>

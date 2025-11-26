@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { Form, Button, Container, Row, Col, InputGroup } from 'react-bootstrap';
 import { FaEnvelope, FaLock, FaSignInAlt } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
+import { UserContext } from '../contexts/UserContext';
+import config from '../config';
 
 function Login() {
   const [form, setForm] = useState({ email: '', password: '' });
@@ -11,6 +13,7 @@ function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const navigate = useNavigate();
+  const { setUser } = useContext(UserContext);
 
   const validate = () => {
     const newErrors = {};
@@ -45,6 +48,18 @@ function Login() {
           setForm({ email: '', password: '' });
           if (data.email) {
             sessionStorage.setItem('email', data.email);
+          }
+          // Refresh the global user context immediately after login
+          try {
+            const meRes = await fetch(`${config.API_BASE_URL}/api/auth/user/`, { credentials: 'include' });
+            if (meRes.ok) {
+              const me = await meRes.json();
+              setUser(me);
+            } else {
+              setUser(null);
+            }
+          } catch {
+            setUser(null);
           }
           if (data.role === 'doctor') {
             navigate('/dashboard');
